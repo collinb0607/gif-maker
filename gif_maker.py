@@ -595,6 +595,13 @@ class GifMakerApp:
             missing.append(f"• FFmpeg — {self.ffmpeg_desc}")
         if Image is None:
             missing.append("• Pillow (needed for Preview)")
+        if getattr(sys, "frozen", False):
+            # The downloadable app bundles everything, and sys.executable is the app
+            # itself, so "pip install" would just launch another copy of it.
+            messagebox.showerror("Missing components",
+                                 "This copy of GIF Maker is missing:\n\n" + "\n".join(missing) +
+                                 "\n\nPlease download it again.")
+            return
         if not messagebox.askyesno(
                 "Install required components?",
                 "GIF Maker needs:\n\n" + "\n".join(missing) +

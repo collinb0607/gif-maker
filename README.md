@@ -1,9 +1,25 @@
 # GIF Maker
 
-Turns a video file into a GIF, or a much smaller animated WebP, MP4 or WebM, in a desktop
-window. Works on Windows and macOS.
+**Free, offline alternative to online video-to-GIF converters. No upload limits, no watermark, no account.**
 
-## Setup (one time)
+![GIF Maker: pick a video, click Preview, and the GIF plays with its file size](docs/demo.gif)
+
+Turns a video file into a GIF, or a much smaller animated WebP, MP4 or WebM, in a desktop
+window. Your video never leaves your computer. Works on Windows and macOS.
+
+## Download
+Get the latest version from the [Releases page](https://github.com/collinb0607/gif-maker/releases/latest).
+Nothing else to install: FFmpeg is built in.
+
+| Your computer | Download | First launch |
+|---|---|---|
+| Windows 10/11 | `GIF-Maker-Windows.exe` | Windows may show "Windows protected your PC" because the app isn't signed. Click **More info**, then **Run anyway**. The first start takes a few seconds. |
+| Mac with Apple Silicon (M1 or newer) | `GIF-Maker-macOS.zip` | Unzip, then open **GIF Maker**. macOS blocks it the first time because the app isn't notarized: open **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. |
+
+On an Intel Mac, or any other system, run it from source with Python (below).
+
+## Run from source (Python)
+### Setup (one time)
 1. Install **Python 3.8+** from https://python.org. On Windows, tick **"Add Python to PATH"** during install.
 2. Run the app (see below). The first time, it checks for what it needs and asks
    **"Install required components?"** Click **Yes**. It downloads:
@@ -17,7 +33,7 @@ The status line at the bottom always shows which FFmpeg the app is using. The ap
 ignores copies of FFmpeg that are too old, such as ones bundled with other
 programs.
 
-## Run
+### Run
 ```
 python gif_maker.py        # Windows
 python3 gif_maker.py       # macOS

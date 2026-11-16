@@ -3,6 +3,12 @@
 *.webp
 *.mp4
 *.webm
+!docs/*.gif
+
+# PyInstaller output
+build/
+dist/
+*.spec
 
 __pycache__/
 *.pyc
