@@ -5,7 +5,8 @@
 ![GIF Maker: pick a video, click Preview, and the GIF plays with its file size](docs/demo.gif)
 
 Turns a video file into a GIF, or a much smaller animated WebP, MP4 or WebM, in a desktop
-window. Your video never leaves your computer. Works on Windows and macOS.
+window. Drag a video onto the window, or click Browse. Your video never leaves your computer.
+Works on Windows and macOS.
 
 ## Download
 Get the latest version from the [Releases page](https://github.com/collinb0607/gif-maker/releases/latest).
@@ -25,6 +26,7 @@ On an Intel Mac, or any other system, run it from source with Python (below).
    **"Install required components?"** Click **Yes**. It downloads:
    - `imageio-ffmpeg`, which includes FFmpeg, the video engine, so you don't have to install it separately
    - `pillow`, which powers the preview
+   - `tkinterdnd2`, for dragging a video onto the window (optional: **Browse** works without it)
 
    This takes about a minute (30–60 MB). The app then shows **"Installed! Using FFmpeg …"** at the bottom.
    You won't be asked again.
@@ -46,7 +48,7 @@ components once more. The install dialog shows which Python it installs into.
 - **Automatic install failed:** the error dialog shows the exact command to run in a
   terminal. It looks like this, using the path of the Python that runs the app:
   ```
-  "C:\Path\To\python.exe" -m pip install imageio-ffmpeg pillow
+  "C:\Path\To\python.exe" -m pip install imageio-ffmpeg pillow tkinterdnd2
   ```
   Use that exact command rather than a plain `pip install`. If you have more than one Python
   installed, `pip` may install into a different one than the one that runs the app.

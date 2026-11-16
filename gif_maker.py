@@ -7,8 +7,9 @@ Requirements:
     Python 3.8+ (with Tkinter, included in the python.org installers)
     imageio-ffmpeg -> bundles an FFmpeg binary (no separate install needed)
     pillow         -> used to play the animated preview
-    The app offers to install both on first run. Manual install, using the Python that runs the app:
-        python -m pip install imageio-ffmpeg pillow
+    tkinterdnd2    -> drag and drop (optional: the app works without it)
+    The app offers to install them on first run. Manual install, using the Python that runs the app:
+        python -m pip install imageio-ffmpeg pillow tkinterdnd2
 
 Run:
     python gif_maker.py
@@ -155,7 +156,7 @@ def install_requirements():
     exe = sys.executable
     if exe.lower().endswith("pythonw.exe"):  # pythonw has no console; use python.exe for pip
         exe = exe[:-len("pythonw.exe")] + "python.exe"
-    r = subprocess.run([exe, "-m", "pip", "install", "--upgrade", "imageio-ffmpeg", "pillow"],
+    r = subprocess.run([exe, "-m", "pip", "install", "--upgrade", "imageio-ffmpeg", "pillow", "tkinterdnd2"],
                        capture_output=True, text=True, errors="replace", **_POPEN_FLAGS)
     add_user_site()
     return r.returncode == 0, (r.stderr or r.stdout).strip().splitlines()[-3:]
@@ -582,6 +583,9 @@ class GifMakerApp:
         self._update_res_label()
         self._on_format_change()
 
+        self.dnd = enable_drag_and_drop(root, self._on_drop)
+        if self.dnd:
+            self.info_lbl.config(text="No video selected — drag one here, or use Browse.")
         if self.ffmpeg:
             self.status.config(text=f"Ready — using {self.ffmpeg_desc}.")
         # Defer so the main window is drawn before any dialog appears.
@@ -632,13 +636,15 @@ class GifMakerApp:
             self.status.config(text=f"Installed! Using {self.ffmpeg_desc}.")
             if self.v["src"].get():
                 self._probe(self.v["src"].get())  # re-read the already chosen video
+            if not self.dnd:  # tkinterdnd2 was just installed too
+                self.dnd = enable_drag_and_drop(self.root, self._on_drop)
         else:
             self.status.config(text="Install failed — see the error message.")
             messagebox.showerror(
                 "Install failed",
                 "Couldn't install automatically:\n\n" + "\n".join(tail) +
                 "\n\nTry running this in a terminal:\n"
-                f'"{sys.executable}" -m pip install imageio-ffmpeg pillow')
+                f'"{sys.executable}" -m pip install imageio-ffmpeg pillow tkinterdnd2')
 
     # ---- layout --------------------------------------------------------- #
     def _build_ui(self):
@@ -802,11 +808,26 @@ class GifMakerApp:
 
     def pick_video(self):
         path = filedialog.askopenfilename(title="Choose a video", filetypes=VIDEO_TYPES)
-        if not path:
-            return
+        if path:
+            self._use_video(path)
+
+    def _use_video(self, path):
         self.v["src"].set(path)
         self.v["out_name"].set(os.path.splitext(os.path.basename(path))[0] + "." + self._fmt()["ext"])
         self._probe(path)
+
+    def _on_drop(self, paths):
+        """A video dropped on the window: use it like one picked with Browse."""
+        if self.go_btn.instate(["disabled"]):
+            self.status.config(text="Wait for this video to finish before choosing another.")
+            return
+        files = [p for p in paths if os.path.isfile(p)]
+        if not files:
+            self.status.config(text="Drop a video file (folders aren't supported).")
+            return
+        self._use_video(files[0])
+        if len(paths) > 1:
+            self.status.config(text=f"One video at a time: using {os.path.basename(files[0])}.")
 
     def _probe(self, path):
         """Read the video's length/size/fps and show it under the file box."""
@@ -1280,6 +1301,45 @@ class PreviewWindow:
             self.app.preview_win = None
 
 
+def enable_drag_and_drop(root, on_drop, on_enter=None, on_leave=None):
+    """Accept files dragged onto the window, using tkinterdnd2 if it's installed.
+    Returns False when it isn't (or its native part can't load): the Browse
+    buttons still work, so drag and drop is optional.
+
+    on_drop gets the list of dropped paths. Every widget is registered, so a
+    drop works anywhere in the window.
+    """
+    try:
+        from tkinterdnd2 import DND_FILES, TkinterDnD
+        TkinterDnD.require(root)
+    except Exception:
+        return False
+
+    def drop(event):
+        # The paths come as a Tcl list: names with spaces are in {braces}.
+        on_drop(list(root.tk.splitlist(event.data)))
+        return event.action  # "copy": the files stay where they are
+
+    def hook(fn):
+        def handler(event):
+            if fn:
+                fn()
+            return event.action
+        return handler
+
+    widgets, todo = [], list(root.winfo_children())
+    while todo:
+        w = todo.pop()
+        widgets.append(w)
+        todo += w.winfo_children()
+    for w in widgets:
+        w.drop_target_register(DND_FILES)
+        w.dnd_bind("<<Drop>>", drop)
+        w.dnd_bind("<<DropEnter>>", hook(on_enter))
+        w.dnd_bind("<<DropLeave>>", hook(on_leave))
+    return True
+
+
 LOG_PATH = os.path.join(tempfile.gettempdir(), "gif_maker_errors.log")
 
 
@@ -1306,7 +1366,26 @@ def open_file(path):
         pass
 
 
+def self_test():
+    """Used by the release build: exit code 0 if FFmpeg and drag and drop both
+    work in the packaged app, so a missing piece fails the build."""
+    if not find_ffmpeg()[0]:
+        return 1
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        from tkinterdnd2 import TkinterDnD
+        TkinterDnD.require(root)
+        root.destroy()
+    except Exception as e:
+        log_error(f"Self-test failed: {type(e).__name__}: {e}")
+        return 2
+    return 0
+
+
 def main():
+    if "--self-test" in sys.argv:
+        sys.exit(self_test())
     root = tk.Tk()
     try:  # nicer native look where available
         ttk.Style().theme_use("vista" if sys.platform == "win32" else
