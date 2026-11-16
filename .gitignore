@@ -1,0 +1,8 @@
+# Output made by the app (test GIFs can be tens of MB)
+*.gif
+*.webp
+*.mp4
+*.webm
+
+__pycache__/
+*.pyc
