@@ -752,8 +752,12 @@ class GifMakerApp:
         self.preview_btn.grid(row=0, column=2, padx=(6, 0))
         self.go_btn = ttk.Button(f, text="Generate", command=lambda: self.start(preview=False))
         self.go_btn.grid(row=0, column=3, padx=(6, 0))
-        self.status = ttk.Label(main, text="Ready.", wraplength=560)
-        self.status.grid(row=7, column=0, sticky="w", **pad)
+        foot = ttk.Frame(main)  # the status line, with the support link on its right
+        foot.grid(row=7, column=0, sticky="ew", **pad)
+        foot.columnconfigure(0, weight=1)
+        self.status = ttk.Label(foot, text="Ready.", wraplength=410)
+        self.status.grid(row=0, column=0, sticky="w")
+        support_link(foot).grid(row=0, column=1, sticky="ne", padx=(12, 0))
 
     # ---- small helpers -------------------------------------------------- #
     def _toggle_range(self):
@@ -1381,6 +1385,19 @@ def self_test():
         log_error(f"Self-test failed: {type(e).__name__}: {e}")
         return 2
     return 0
+
+
+SUPPORT_URL = "https://ko-fi.com/collinbrooksdev"
+
+
+def support_link(parent, bg=None, font=None):
+    """A small "Support this project" link that opens the Ko-fi page in the browser."""
+    import webbrowser
+    kw = {"bg": bg} if bg else {}
+    link = tk.Label(parent, text="\u2665 Support this project", fg="#c8364f", cursor="hand2",
+                    font=font or ("", 9, "underline"), **kw)
+    link.bind("<Button-1>", lambda e: webbrowser.open(SUPPORT_URL))
+    return link
 
 
 def main():

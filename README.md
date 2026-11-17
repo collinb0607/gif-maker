@@ -99,3 +99,9 @@ App support changes over time, so try a quick test send if it matters.
 | Reverse | Plays the clip backwards (sound too) |
 | Save to / File name | Where the file goes |
 | **Preview** | Makes the file and plays it in a window, opened over the main window on the same monitor, with its file size, dimensions, frame count and length. The preview is silent. **Save this …** saves that exact file, so it isn't made again |
+
+## Support this project
+This app is free, with no ads, accounts or limits. If it saved you time or a subscription, you can
+support its development on Ko-fi:
+
+[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/collinbrooksdev)
