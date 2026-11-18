@@ -54,7 +54,7 @@ components once more. The install dialog shows which Python it installs into.
   installed, `pip` may install into a different one than the one that runs the app.
 - **"Couldn't read video: …"** under the file box: the message gives the reason. "Incomplete or
   damaged" usually means the recording was interrupted or is still being written.
-- **A format is greyed out or shows "can't make … files":** that FFmpeg build is missing the
+- **A format is grayed out or shows "can't make … files":** that FFmpeg build is missing the
   encoder for it. The FFmpeg that the app installs includes all four.
 - **GIF is bigger than the video:** this is normal. MP4 compression only stores what changes
   between frames. GIF stores each frame as a separate image with at most 256 colors, so it
