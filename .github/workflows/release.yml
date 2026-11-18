@@ -36,7 +36,7 @@ jobs:
         if: runner.os == 'Windows'
         # One file, no console window. --collect-data bundles imageio-ffmpeg's FFmpeg binary.
         run: |
-          pyinstaller --noconfirm --onefile --windowed --name GIF-Maker --collect-data imageio_ffmpeg gif_maker.py
+          pyinstaller --noconfirm --icon assets/icon.ico --onefile --windowed --name GIF-Maker --collect-data imageio_ffmpeg gif_maker.py
           Move-Item dist/GIF-Maker.exe ${{ matrix.asset }}
 
       - name: Build (macOS)
@@ -44,7 +44,7 @@ jobs:
         # A .app bundle (one-dir: macOS apps are folders). ditto keeps the
         # permissions and code signature that a plain zip would lose.
         run: |
-          pyinstaller --noconfirm --windowed --name "GIF Maker" --collect-data imageio_ffmpeg gif_maker.py
+          pyinstaller --noconfirm --icon assets/icon.icns --windowed --name "GIF Maker" --collect-data imageio_ffmpeg gif_maker.py
           ditto -c -k --keepParent "dist/GIF Maker.app" ${{ matrix.asset }}
 
       # Smoke test: the app must start and still be running after 20 s
